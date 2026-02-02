@@ -1,0 +1,5 @@
+event_simpleName="ProcessRollup2"
+ParentBaseFileName=notepad++.exe
+| in(FileName, values=["cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe", "mshta.exe", "rundll32.exe", "regsvr32.exe"])
+| groupBy([aid, ComputerName, UserName, ParentBaseFileName, FileName], function=[count(), collect(CommandLine)])
+| rename(field="_count", as="execution_count")
