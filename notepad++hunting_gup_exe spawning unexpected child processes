@@ -1,0 +1,4 @@
+event_simpleName="ProcessRollup2"
+ParentBaseFileName=gup.exe
+| groupBy([aid, ComputerName, UserName, ParentBaseFileName, ParentProcessId], function=[count(), collect(FileName)])
+| rename(field="_count", as="spawn_count")
