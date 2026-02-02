@@ -1,0 +1,5 @@
+event_simpleName="ProcessRollup2"
+GrandParentBaseFileName IN (GrandParentBaseFileName, values=["notepad++.exe", "gup.exe"])
+| in(FileName, values=["whoami.exe", "net.exe", "nltest.exe", "ipconfig.exe", "systeminfo.exe", "tasklist.exe", "netstat.exe"])
+| groupBy([aid, ComputerName, UserName, ParentBaseFileName, FileName], function=[count(), collect(CommandLine)])
+| rename(field="_count", as="recon_count")
