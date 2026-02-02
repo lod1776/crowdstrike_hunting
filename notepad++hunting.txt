@@ -3,5 +3,5 @@ ImageFileName=*gup.exe
 RemoteName!=*notepad-plus-plus.org
 RemoteName!=*github.com
 RemoteName!=*githubusercontent.com
-| groupBy([aid, ComputerName, UserName, ImageFileName, LocalIP, RemoteIP], function=[count(), dc(RemoteName, as=unique_domains), collect(RemoteName)])
+| groupBy([aid, ComputerName, UserName, ImageFileName, LocalIP, RemoteIP], function=[count(), count(RemoteName, distinct=true, as=unique_domains), collect(RemoteName)])
 | rename(field="_count", as="connection_count")
