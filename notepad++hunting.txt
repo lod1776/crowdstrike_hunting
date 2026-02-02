@@ -1,0 +1,7 @@
+// Detect suspicious Notepad++ updater (gup.exe) network activity
+event_simpleName="NetworkConnectIP4"
+AND ImageFileName=*gup.exe
+AND RemoteName!=*notepad-plus-plus.org
+AND RemoteName!=*github.com
+AND RemoteName!=*githubusercontent.com
+| stats count dc(RemoteName) as unique_domains values(RemoteName) as contacted_domains by aid ComputerName UserName ImageFileName LocalIP RemoteIP
