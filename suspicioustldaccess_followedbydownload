@@ -1,0 +1,13 @@
+// Get DNS/network connections to suspicious TLDs from the lookup file
+#event_simpleName=/^(DnsRequest|NetworkConnect)$/
+| match(file="Suspicious_TLD.csv", field=DomainName, column=DomainName, mode=glob, ignoreCase=true, include=[DomainName])
+| eval(connection_time=@timestamp, connection_aid=aid, connection_domain=DomainName, connection_ip=RemoteAddressIP4, connection_process=ContextProcessId)
+| rename(aid, as=join_aid)
+| join({
+    #event_simpleName=/^(ProcessRollup2|AsepValueUpdate|NewExecutableWritten|PeFileWritten|DocumentFileWritten)$/
+  }, field=join_aid, key=aid, include=[TargetFileName, SHA256HashData, @timestamp])
+| eval(time_diff=(@timestamp - connection_time)/1000)
+| time_diff <= 180
+| time_diff >= 0
+| table([connection_time, join_aid, connection_domain, connection_ip, TargetFileName, SHA256HashData, time_diff])
+| sort(connection_time, order=desc, limit=1000)
