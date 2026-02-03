@@ -1,0 +1,14 @@
+// Get MotwWritten events (file downloads)
+#event_simpleName=MotwWritten
+| eval(download_time=@timestamp, download_aid=aid, download_file=TargetFileName, download_filename=FileName, download_hash=SHA256HashData)
+| rename(aid, as=join_aid)
+| join({
+    #event_simpleName=DnsRequest
+    | match(file="Suspicious_TLD.csv", field=DomainName, column=DomainName, mode=glob, ignoreCase=true, include=[DomainName])
+  }, field=join_aid, key=aid, include=[DomainName, RemoteAddressIP4, @timestamp])
+| eval(time_diff=(download_time - @timestamp)/1000)
+| time_diff <= 180
+| time_diff >= 0
+| groupBy([download_time, download_aid, download_file, download_filename, download_hash], function=[min(@timestamp, as=closest_dns_time), selectLast([DomainName, RemoteAddressIP4], by=@timestamp)])
+| table([download_time, download_aid, download_file, download_filename, download_hash, closest_dns_time, DomainName, RemoteAddressIP4])
+| sort(download_time, order=desc, limit=1000)
