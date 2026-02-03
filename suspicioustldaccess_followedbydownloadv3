@@ -9,6 +9,6 @@
 | time_diff <= 180
 | time_diff >= 0
 | sort(@timestamp, order=desc)
-| groupBy([download_time, download_aid, download_file, download_filename, download_hash], function=[selectFromMax(@timestamp, [DomainName, RemoteAddressIP4])])
+| groupBy([download_time, download_aid, download_file, download_filename, download_hash], function=[selectFromMax(field=@timestamp, include=[DomainName, RemoteAddressIP4])])
 | table([download_time, download_aid, download_file, download_filename, download_hash, DomainName, RemoteAddressIP4])
 | sort(download_time, order=desc, limit=1000)
